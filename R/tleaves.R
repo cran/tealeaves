@@ -39,7 +39,7 @@
 #' \code{value} \tab Leaf energy balance (W / m^2) at \code{tleaf} \cr
 #' \code{convergence} \tab Convergence code (0 = converged) \cr
 #' \code{R_abs} \tab Total absorbed radiation (W / m^2; see \code{\link{.get_Rabs}}) \cr
-#' \code{S_r} \tab Longwave re-radiation (W / m^2; see \code{\link{.get_Sr}}) \cr
+#' \code{S_r} \tab Thermal infrared radiation loss (W / m^2; see \code{\link{.get_Sr}}) \cr
 #' \code{H} \tab Sensible heat flux density (W / m^2; see \code{\link{.get_H}}) \cr
 #' \code{L} \tab Latent heat flux density (W / m^2; see \code{\link{.get_L}}) \cr
 #' \code{E} \tab Evapotranspiration (mol H2O/ (m^2 s))
@@ -50,7 +50,7 @@
 #' A data.frame with the following numeric columns: \cr
 #' 
 #' \tabular{ll}{
-#' \code{T_leaf} \tab Equilibrium leaf tempearture (K) \cr
+#' \code{T_leaf} \tab Equilibrium leaf temperature (K) \cr
 #' \code{value} \tab Leaf energy balance (W / m^2) at \code{tleaf} \cr
 #' \code{convergence} \tab Convergence code (0 = converged) \cr
 #' \code{R_abs} \tab Total absorbed radiation (W / m^2; see \code{\link{.get_Rabs}}) \cr
@@ -84,14 +84,17 @@ tleaves <- function(leaf_par, enviro_par, constants, progress = TRUE,
                     quiet = FALSE, set_units = TRUE, parallel = FALSE) {
   
   if (set_units) {
-    leaf_par %<>% leaf_par()
-    enviro_par %<>% enviro_par()
-    constants %<>% constants()
+    leaf_par %<>% tealeaves::leaf_par()
+    enviro_par %<>% tealeaves::enviro_par()
+    constants %<>% tealeaves::constants()
   } else {
     if (!quiet) warning("tleaves: units have not been checked prior to solving")
   }
   
   pars <- c(leaf_par, enviro_par)
+  if (is.function(pars$T_sky)) {
+    pars$T_sky <- pars$T_sky(pars)
+  }
   par_units <- purrr::map(pars, units) %>%
     magrittr::set_names(names(pars))
   
@@ -128,9 +131,9 @@ tleaf <- function(leaf_par, enviro_par, constants, quiet = FALSE,
                   set_units = TRUE) {
   
   if (set_units) {
-    leaf_par %<>% leaf_par()
-    enviro_par %<>% enviro_par()
-    constants %<>% constants()
+    leaf_par %<>% tealeaves::leaf_par()
+    enviro_par %<>% tealeaves::enviro_par()
+    constants %<>% tealeaves::constants()
   } else {
     if (!quiet) warning("tleaf: units have not been checked prior to solving")
   }
@@ -170,6 +173,24 @@ tleaf <- function(leaf_par, enviro_par, constants, quiet = FALSE,
                                   unitless = TRUE))
   }
   soln$T_leaf %<>% set_units(K)
+  
+  # Adding g_bw to output 
+  if (is.na(soln$T_leaf)) {
+    soln$g_bw <- NA
+  } else {
+    soln$g_bw <- .get_gbw(
+      T_leaf = drop_units(soln$T_leaf), 
+      surface = "lower", 
+      pars = c(ulp, uep, ucs), 
+      unitless = TRUE
+    ) + 
+      .get_gbw(
+        T_leaf = drop_units(soln$T_leaf), 
+        surface = "upper", 
+        pars = c(ulp, uep, ucs), 
+        unitless = TRUE
+      )
+  }
   
   # Return -----
   soln
@@ -212,9 +233,9 @@ energy_balance <- function(tleaf, leaf_par, enviro_par, constants,
     tleaf %<>% 
       set_units(K) %>%
       drop_units()
-    leaf_par %<>% leaf_par()
-    enviro_par %<>% enviro_par()
-    constants %<>% constants()
+    leaf_par %<>% tealeaves::leaf_par()
+    enviro_par %<>% tealeaves::enviro_par()
+    constants %<>% tealeaves::constants()
   }
   stopifnot(length(quiet) == 1L & is.logical(quiet))
   stopifnot(length(components) == 1L & is.logical(components))
@@ -275,7 +296,7 @@ energy_balance <- function(tleaf, leaf_par, enviro_par, constants,
 #' 
 #' \deqn{R_\mathrm{abs} = \alpha_\mathrm{s} (1 + r) S_\mathrm{sw} + \alpha_\mathrm{l} \sigma (T_\mathrm{sky} ^ 4 + T_\mathrm{air} ^ 4)}{R_abs = \alpha_s (1 + r) S_sw + \alpha_l \sigma (T_sky ^ 4 + T_air ^ 4)}
 #' 
-#' The incidient longwave (aka thermal infrared) radiation is modeled from sky and air temperature \eqn{\sigma (T_\mathrm{sky} ^ 4 + T_\mathrm{air} ^ 4)}{\sigma (T_sky ^ 4 + T_air ^ 4)} where \eqn{T_\mathrm{sky}}{T_sky} is function of the air temperature and incoming solar shortwave radiation:
+#' The incident longwave (aka thermal infrared) radiation is modeled from sky and air temperature \eqn{\sigma (T_\mathrm{sky} ^ 4 + T_\mathrm{air} ^ 4)}{\sigma (T_sky ^ 4 + T_air ^ 4)} where \eqn{T_\mathrm{sky}}{T_sky} is function of the air temperature and incoming solar shortwave radiation:
 #' 
 #' \deqn{T_\mathrm{sky} = T_\mathrm{air} - 20 S_\mathrm{sw} / 1000}{T_sky = T_air - 20 S_sw / 1000}
 #' 
@@ -284,7 +305,7 @@ energy_balance <- function(tleaf, leaf_par, enviro_par, constants,
 #' \eqn{\alpha_\mathrm{s}}{\alpha_s} \tab \code{abs_s} \tab absorbtivity of shortwave radiation (0.3 - 4 \eqn{\mu}m) \tab none \tab 0.80\cr
 #' \eqn{\alpha_\mathrm{l}}{\alpha_l} \tab \code{abs_l} \tab absorbtivity of longwave radiation (4 - 80 \eqn{\mu}m) \tab none \tab 0.97\cr
 #' \eqn{r} \tab \code{r} \tab reflectance for shortwave irradiance (albedo) \tab none \tab 0.2 \cr
-#' \eqn{\sigma} \tab \code{s} \tab Stephan-Boltzmann constant \tab W / (m\eqn{^2} K\eqn{^4}) \tab 5.67e-08 \cr
+#' \eqn{\sigma} \tab \code{s} \tab Stefan-Boltzmann constant \tab W / (m\eqn{^2} K\eqn{^4}) \tab 5.67e-08 \cr
 #' \eqn{S_\mathrm{sw}}{S_sw} \tab \code{S_sw} \tab incident short-wave (solar) radiation flux density \tab W / m\eqn{^2} \tab 1000 \cr
 #' \eqn{S_\mathrm{lw}}{S_lw} \tab \code{S_lw} \tab incident long-wave radiation flux density \tab W / m\eqn{^2} \tab calculated \cr
 #' \eqn{T_\mathrm{air}}{T_air} \tab \code{T_air} \tab air temperature \tab K \tab 298.15 \cr
@@ -340,7 +361,7 @@ energy_balance <- function(tleaf, leaf_par, enviro_par, constants,
 #' \emph{Symbol} \tab \emph{R} \tab \emph{Description} \tab \emph{Units} \tab \emph{Default}\cr
 #' \eqn{\alpha_\mathrm{l}}{\alpha_l} \tab \code{abs_l} \tab absorbtivity of longwave radiation (4 - 80 \eqn{\mu}m) \tab none \tab 0.97\cr
 #' \eqn{T_\mathrm{air}}{T_air} \tab \code{T_air} \tab air temperature \tab K \tab 298.15\cr
-#' \eqn{\sigma} \tab \code{s} \tab Stephan-Boltzmann constant \tab W / (m\eqn{^2} K\eqn{^4}) \tab 5.67e-08
+#' \eqn{\sigma} \tab \code{s} \tab Stefan-Boltzmann constant \tab W / (m\eqn{^2} K\eqn{^4}) \tab 5.67e-08
 #' }
 #' 
 #' Note that leaf absorbtivity is the same value as leaf emissivity
@@ -520,7 +541,7 @@ energy_balance <- function(tleaf, leaf_par, enviro_par, constants,
 #' 
 #' \deqn{D = D_\mathrm{0} (T / 273.15) ^ {eT} (101.3246 / P)}{D = D_0 [(T / 273.15) ^ eT] (101.3246 / P)}
 #' \cr
-#' According to Montieth & Unger (2013), eT is generally between 1.5 and 2. Their data in Appendix 3 indicate \eqn{eT = 1.75} is reasonble for environmental physics.
+#' According to Montieth & Unger (2013), eT is generally between 1.5 and 2. Their data in Appendix 3 indicate \eqn{eT = 1.75} is reasonable for environmental physics.
 #' 
 #' @references 
 #' 
@@ -947,7 +968,7 @@ energy_balance <- function(tleaf, leaf_par, enviro_par, constants,
 #' \deqn{g_\mathrm{sw,upper} = g_\mathrm{sw} sr R (T_\mathrm{leaf} + T_\mathrm{air}) / 2}{gsw_upper = g_sw sr R (T_leaf + T_air) / 2}
 #' \deqn{g_\mathrm{uw,upper} = g_\mathrm{uw} / 2 R (T_\mathrm{leaf} + T_\mathrm{air}) / 2}{guw_upper = g_uw / 2 R (T_leaf + T_air) / 2}
 #' \cr
-#' Note that the stomatal and cuticular conductances are given in units of (\eqn{\mu}mol H2O) / (m\eqn{^2} s Pa) (see \code{\link{make_leafpar}}) and converted to m/s using the ideal gas law. The total leaf stomtal (\eqn{g_\mathrm{sw}}{g_sw}) and cuticular (\eqn{g_\mathrm{uw}}{g_uw}) conductances are partitioned across lower and upper surfaces. The stomatal conductance on each surface depends on stomatal ratio (sr); the cuticular conductance is assumed identical on both surfaces. 
+#' Note that the stomatal and cuticular conductances are given in units of (\eqn{\mu}mol H2O) / (m\eqn{^2} s Pa) (see \code{\link{make_leafpar}}) and converted to m/s using the ideal gas law. The total leaf stomatal (\eqn{g_\mathrm{sw}}{g_sw}) and cuticular (\eqn{g_\mathrm{uw}}{g_uw}) conductances are partitioned across lower and upper surfaces. The stomatal conductance on each surface depends on stomatal ratio (sr); the cuticular conductance is assumed identical on both surfaces. 
 #'
 #' \tabular{lllll}{
 #' \emph{Symbol} \tab \emph{R} \tab \emph{Description} \tab \emph{Units} \tab \emph{Default}\cr
@@ -1248,7 +1269,7 @@ find_tleaves <- function(par_sets, constants, progress, quiet, parallel) {
       message(appendLF = FALSE)
   }
   
-  if (parallel) future::plan("multiprocess")
+  if (parallel) future::plan("multisession")
 
   if (progress & !parallel) pb <- dplyr::progress_estimated(length(par_sets))
   

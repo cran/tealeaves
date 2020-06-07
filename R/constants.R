@@ -2,7 +2,7 @@
 #' @exportClass constants
 #
 
-#' @param .x A list to be constructed into \strong{constants}.
+#' @param .x A list to be constructed into \strong{constants}. If units are not provided, they will be set without conversion. If units are provided, they will be checked and converted to units that tealeaves uses.
 #' 
 #' @description 
 #' 
@@ -13,7 +13,7 @@
 constants <- function(.x) {
   
   which <- "constants"
-  nms <- parameter_names(which)
+  nms <- tealeaves::parameter_names(which)
   
   stopifnot(is.list(.x))
   
@@ -27,11 +27,6 @@ constants <- function(.x) {
   
   .x %<>% magrittr::extract(nms)
 
-  .x %>%
-    purrr::map(class) %>%
-    magrittr::is_in(c("units", "function")) %>%
-    stopifnot()
-  
   # Set units ----
   .x$c_p %<>% set_units(J / (g * K))
   .x$D_h0 %<>% set_units(m ^ 2 / s)

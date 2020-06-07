@@ -24,8 +24,8 @@ NULL
 #' \tabular{lllll}{
 #' \emph{Symbol} \tab \emph{R} \tab \emph{Description} \tab \emph{Units} \tab \emph{Default}\cr
 #' \eqn{d} \tab \code{leafsize} \tab Leaf characteristic dimension \tab m \tab 0.1 \cr
-#' \eqn{\alpha_\mathrm{s}}{\alpha_s} \tab \code{abs_s} \tab absorbtivity of shortwave radiation (0.3 - 4 \eqn{\mu}m) \tab none \tab 0.50 \cr
 #' \eqn{\alpha_\mathrm{l}}{\alpha_l} \tab \code{abs_l} \tab absorbtivity of longwave radiation (4 - 80 \eqn{\mu}m) \tab none \tab 0.97 \cr
+#' \eqn{\alpha_\mathrm{s}}{\alpha_s} \tab \code{abs_s} \tab absorbtivity of shortwave radiation (0.3 - 4 \eqn{\mu}m) \tab none \tab 0.50 \cr
 #' \eqn{g_\mathrm{sw}}{g_sw} \tab \code{g_sw} \tab stomatal conductance to H2O \tab (\eqn{\mu}mol H2O) / (m\eqn{^2} s Pa) \tab 5 \cr
 #' \eqn{g_\mathrm{uw}}{g_uw} \tab \code{g_uw} \tab cuticular conductance to H2O \tab (\eqn{\mu}mol H2O) / (m\eqn{^2} s Pa) \tab 0.1 \cr
 #' \eqn{\mathrm{logit}(sr)}{logit(sr)} \tab \code{logit_sr} \tab stomatal ratio (logit transformed) \tab none \tab 0 = logit(0.5)
@@ -57,7 +57,7 @@ NULL
 #' \eqn{Nu} \tab \code{Nu} \tab Nusselt number \tab none \tab \link[=.get_nu]{calculated} \cr
 #' \eqn{R} \tab \code{R} \tab ideal gas constant \tab J / (mol K) \tab 8.3144598 \cr
 #' \eqn{R_\mathrm{air}}{R_air} \tab \code{R_air} \tab specific gas constant for dry air \tab J / (kg K) \tab 287.058\cr
-#' \eqn{\sigma} \tab \code{s} \tab Stephan-Boltzmann constant \tab W / (m\eqn{^2} K\eqn{^4}) \tab 5.67e-08 \cr
+#' \eqn{\sigma} \tab \code{s} \tab Stefan-Boltzmann constant \tab W / (m\eqn{^2} K\eqn{^4}) \tab 5.67e-08 \cr
 #' \eqn{Sh} \tab \code{Sh} \tab Sherwood number \tab none \tab \link[=.get_sh]{calculated}
 #' }
 #'
@@ -103,7 +103,7 @@ make_leafpar <- function(replace = NULL) {
   obj %<>% replace_defaults(replace)
 
   # Assign class and return -----
-  obj %<>% leaf_par()
+  obj %<>% tealeaves::leaf_par()
 
   obj
 
@@ -122,15 +122,25 @@ make_enviropar <- function(replace = NULL) {
     r = set_units(0.2),
     S_sw = set_units(1000, W / m ^ 2),
     T_air = set_units(298.15, K),
+    T_sky = function(pars) {
+      pars$T_air - set_units(20, K) * pars$S_sw / set_units(1000, W / m ^ 2)
+    },
     wind = set_units(2, m / s)
   ) 
   
   # Replace defaults -----
 
+  if ("T_sky" %in% names(replace)) {
+    if (is.function(replace$T_sky)) {
+      obj$T_sky <- replace$T_sky
+      replace$T_sky <- NULL
+    }
+  }
+  
   obj %<>% replace_defaults(replace)
 
   # Assign class and return -----
-  obj %<>% enviro_par()
+  obj %<>% tealeaves::enviro_par()
   
   obj
 
@@ -217,7 +227,7 @@ make_constants <- function(replace = NULL) {
   obj %<>% replace_defaults(replace)
 
   # Assign class and return -----
-  obj %<>% constants()
+  obj %<>% tealeaves::constants()
   
   obj
 

@@ -9,6 +9,8 @@
 status](https://www.r-pkg.org/badges/version/tealeaves)](https://cran.r-project.org/package=tealeaves)
 [![Build
 Status](https://travis-ci.org/cdmuir/tealeaves.svg?branch=master)](https://travis-ci.org/cdmuir/tealeaves)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2808079.svg)](https://doi.org/10.5281/zenodo.2808079)
+[![](https://cranlogs.r-pkg.org/badges/tealeaves)](https://cran.r-project.org/package=tealeaves)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
@@ -29,15 +31,13 @@ wind, or trait gradients such as leaf size or stomatal conductance.
 
 ## Get tealeaves
 
-<!--- From CRAN
+From CRAN
 
-```r
+``` r
 install.packages("tealeaves")
 ```
 
-or from -->
-
-GitHub
+or from GitHub
 
 ``` r
 install.packages("devtools")
@@ -68,6 +68,11 @@ In this vignette, I’ll show you how to:
   - replace default parameters
   - solve for leaf temperature along an environmental gradient
 
+Note that my examples use a lot tidyverse syntax, especially the pipe
+operator `%>%`. These are not required to use {tealeaves}, but you can
+learn more about the the tidyverse [here](https://www.tidyverse.org) and
+the `%>%` more specifically [here](https://magrittr.tidyverse.org/).
+
 ## Minimum worked example
 
 You can use the default parameter settings and solve for leaf
@@ -90,9 +95,9 @@ T_leaf <- tleaf(leaf_par, enviro_par, constants, quiet = TRUE)
 T_leaf %>% knitr::kable()
 ```
 
-|        T\_leaf | value | convergence |             R\_abs |               S\_r |                  H |                  L |                        E |        Ar |       Gr |       Re |
-| -------------: | ----: | ----------: | -----------------: | -----------------: | -----------------: | -----------------: | -----------------------: | --------: | -------: | -------: |
-| 301.4181 \[K\] |     0 |           0 | 1363.813 \[W/m^2\] | 907.9499 \[W/m^2\] | 107.3552 \[W/m^2\] | 348.5078 \[W/m^2\] | 0.00794791 \[mol/m^2/s\] | 0.0048272 | 788182.4 | 12778.08 |
+|        T\_leaf | value | convergence |             R\_abs |               S\_r |                  H |                  L |                        E |        Ar |       Gr |       Re |     g\_bw |
+| -------------: | ----: | ----------: | -----------------: | -----------------: | -----------------: | -----------------: | -----------------------: | --------: | -------: | -------: | --------: |
+| 301.4181 \[K\] |     0 |           0 | 1363.813 \[W/m^2\] | 907.9499 \[W/m^2\] | 107.3552 \[W/m^2\] | 348.5078 \[W/m^2\] | 0.00794791 \[mol/m^2/s\] | 0.0048272 | 788182.4 | 12778.08 | 0.0297282 |
 
 ## Replace default parameters
 
@@ -132,9 +137,9 @@ T_leaf <- tleaf(leaf_par, enviro_par, constants, quiet = TRUE)
 T_leaf %>% knitr::kable()
 ```
 
-|        T\_leaf | value | convergence |             R\_abs |               S\_r |                  H |                  L |                         E |        Ar |       Gr |       Re |
-| -------------: | ----: | ----------: | -----------------: | -----------------: | -----------------: | -----------------: | ------------------------: | --------: | -------: | -------: |
-| 302.1106 \[K\] |     0 |           0 | 1363.813 \[W/m^2\] | 916.3234 \[W/m^2\] | 130.0263 \[W/m^2\] | 317.4631 \[W/m^2\] | 0.007244854 \[mol/m^2/s\] | 0.0055546 | 903289.3 | 12752.29 |
+|        T\_leaf | value | convergence |             R\_abs |               S\_r |                  H |                  L |                         E |        Ar |       Gr |       Re |     g\_bw |
+| -------------: | ----: | ----------: | -----------------: | -----------------: | -----------------: | -----------------: | ------------------------: | --------: | -------: | -------: | --------: |
+| 302.1106 \[K\] |     0 |           0 | 1363.813 \[W/m^2\] | 916.3234 \[W/m^2\] | 130.0263 \[W/m^2\] | 317.4631 \[W/m^2\] | 0.007244854 \[mol/m^2/s\] | 0.0055546 | 903289.3 | 12752.29 | 0.0297445 |
 
 ## Environmental gradients
 
@@ -179,8 +184,12 @@ T_leaves %>%
 |       T\_air |               g\_sw |        T\_leaf |
 | -----------: | ------------------: | -------------: |
 | 293.15 \[K\] | 2 \[umol/m^2/Pa/s\] | 300.2217 \[K\] |
+| 293.15 \[K\] | 2 \[umol/m^2/Pa/s\] | 300.2217 \[K\] |
+| 298.15 \[K\] | 2 \[umol/m^2/Pa/s\] | 304.2065 \[K\] |
 | 298.15 \[K\] | 2 \[umol/m^2/Pa/s\] | 304.2065 \[K\] |
 | 293.15 \[K\] | 4 \[umol/m^2/Pa/s\] | 298.3474 \[K\] |
+| 293.15 \[K\] | 4 \[umol/m^2/Pa/s\] | 298.3474 \[K\] |
+| 298.15 \[K\] | 4 \[umol/m^2/Pa/s\] | 302.1106 \[K\] |
 | 298.15 \[K\] | 4 \[umol/m^2/Pa/s\] | 302.1106 \[K\] |
 
 ## Parallel processing
@@ -245,10 +254,12 @@ new features. You can submit issues here:
   - Please [report any issues or
     bugs](https://github.com/cdmuir/tealeaves/issues).
   - License: MIT
-    <!--- * Get citation information for `tealeaves` in R doing `citation(package = 'tealeaves')` -->
+  - Get citation information for `tealeaves` in R doing
+    `citation(package = 'tealeaves')`
   - Please note that this project is released with a [Contributor Code
-    of Conduct](CONDUCT.md). By participating in this project you agree
-    to abide by its terms.
+    of
+    Conduct](https://github.com/cdmuir/tealeaves/blob/master/CONDUCT.md).
+    By participating in this project you agree to abide by its terms.
 
 <!-- end list -->
 

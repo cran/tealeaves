@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -7,7 +7,7 @@ knitr::opts_chunk$set(
   eval = TRUE
 )
 
-## ---- mwe----------------------------------------------------------------
+## ---- mwe---------------------------------------------------------------------
 
 library(magrittr)
 library(tealeaves)
@@ -23,7 +23,7 @@ T_leaf <- tleaf(leaf_par, enviro_par, constants, quiet = TRUE)
 T_leaf %>% knitr::kable()
 
 
-## ---- replace-defaults---------------------------------------------------
+## ---- replace-defaults--------------------------------------------------------
 
 # Use the `replace` argument to replace defaults. This must be a named list, and
 # each named element must have the proper units specified. See `?make_parameters`
@@ -52,7 +52,7 @@ T_leaf <- tleaf(leaf_par, enviro_par, constants, quiet = TRUE)
 T_leaf %>% knitr::kable()
 
 
-## ---- environmental-gradients--------------------------------------------
+## ---- environmental-gradients-------------------------------------------------
 
 # As before, use the `replace` argument to replace defaults, but this time we
 # enter multiple values
@@ -82,7 +82,7 @@ T_leaves %>%
   knitr::kable()
 
 
-## ---- parallel-example---------------------------------------------------
+## ---- parallel-example--------------------------------------------------------
 
 # We'll use the `replace` argument to enter multiple air temperatures and two light levels
 

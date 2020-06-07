@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -10,7 +10,7 @@ library(magrittr)
 library(tealeaves)
 
 
-## ---- eval = FALSE, echo = TRUE------------------------------------------
+## ---- eval = FALSE, echo = TRUE-----------------------------------------------
 #  
 #  # install tidyverse packages if necessary
 #  # install.packages("tidyverse")
@@ -44,7 +44,7 @@ library(tealeaves)
 #  usethis::use_data(tl_example1)
 #  
 
-## ----plot temperature, echo = FALSE, eval = TRUE, fig.width=7------------
+## ----plot temperature, echo = FALSE, eval = TRUE, fig.width=7-----------------
 
 tl_example1 %<>%
   
@@ -78,7 +78,7 @@ ggplot(tl_example1, aes(T_air, dT, color = `Stomatal Ratio`)) +
   NULL
 
 
-## ----plot transpiration, echo = FALSE, eval = TRUE, fig.width=7----------
+## ----plot transpiration, echo = FALSE, eval = TRUE, fig.width=7---------------
 
 ggplot(tl_example1, aes(T_air, 1000 * E, color = `Stomatal Ratio`)) +
   facet_grid(Light ~ .) + 
