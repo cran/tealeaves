@@ -10,7 +10,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+<meta name="author" content="Chris Mur" />
 
+<meta name="date" content="2020-06-12" />
 
 <title>Defining parameters as functions of other parameters</title>
 
@@ -300,6 +302,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Defining parameters as functions of other parameters</h1>
+<h4 class="author">Chris Mur</h4>
+<h4 class="date">2020-06-12</h4>
 
 
 
@@ -325,8 +329,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt;     pars$T_air - set_units(20, K) * pars$S_sw/set_units(1000, </span></span>
 <span id="cb1-14"><a href="#cb1-14"></a><span class="co">#&gt;         W/m^2)</span></span>
 <span id="cb1-15"><a href="#cb1-15"></a><span class="co">#&gt; }</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; &lt;bytecode: 0x7fb85488d068&gt;</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; &lt;environment: 0x7fb85488a070&gt;</span></span></code></pre></div>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; &lt;bytecode: 0x7fbf8cabc868&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; &lt;environment: 0x7fbf8cabd898&gt;</span></span></code></pre></div>
 <p>Let’s change it simply be the air temperature (<code>T_air</code>). The current requirements for this function as of version 1.0.2 are:</p>
 <ul>
 <li>It must take <code>pars</code> as the only argument, where <code>pars</code> is the concatenated set of leaf (<code>leaf_par()</code>) and environmental parameters (<code>enviro_par()</code>)</li>
@@ -361,18 +365,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">301.4181 [K]</td>
+<td align="right">302.7549 [K]</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">1363.813 [W/m^2]</td>
-<td align="right">907.9499 [W/m^2]</td>
-<td align="right">107.3552 [W/m^2]</td>
-<td align="right">348.5078 [W/m^2]</td>
-<td align="right">0.00794791 [mol/m^2/s]</td>
-<td align="right">0.0048272</td>
-<td align="right">788182.4</td>
-<td align="right">12778.08</td>
-<td align="right">0.0297282</td>
+<td align="right">1469.209 [W/m^2]</td>
+<td align="right">924.1651 [W/m^2]</td>
+<td align="right">151.0922 [W/m^2]</td>
+<td align="right">393.9514 [W/m^2]</td>
+<td align="right">0.008996103 [mol/m^2/s]</td>
+<td align="right">0.0062368</td>
+<td align="right">1010434</td>
+<td align="right">12728.37</td>
+<td align="right">0.0297597</td>
 </tr>
 </tbody>
 </table>
