@@ -12,7 +12,7 @@
 
 <meta name="author" content="Chris Mur" />
 
-<meta name="date" content="2020-06-12" />
+<meta name="date" content="2020-06-17" />
 
 <title>Defining parameters as functions of other parameters</title>
 
@@ -303,7 +303,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Defining parameters as functions of other parameters</h1>
 <h4 class="author">Chris Mur</h4>
-<h4 class="date">2020-06-12</h4>
+<h4 class="date">2020-06-17</h4>
 
 
 
@@ -329,8 +329,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt;     pars$T_air - set_units(20, K) * pars$S_sw/set_units(1000, </span></span>
 <span id="cb1-14"><a href="#cb1-14"></a><span class="co">#&gt;         W/m^2)</span></span>
 <span id="cb1-15"><a href="#cb1-15"></a><span class="co">#&gt; }</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; &lt;bytecode: 0x7fbf8cabc868&gt;</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; &lt;environment: 0x7fbf8cabd898&gt;</span></span></code></pre></div>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; &lt;bytecode: 0x7fb367131490&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; &lt;environment: 0x7fb36712e1c0&gt;</span></span></code></pre></div>
 <p>Let’s change it simply be the air temperature (<code>T_air</code>). The current requirements for this function as of version 1.0.2 are:</p>
 <ul>
 <li>It must take <code>pars</code> as the only argument, where <code>pars</code> is the concatenated set of leaf (<code>leaf_par()</code>) and environmental parameters (<code>enviro_par()</code>)</li>
