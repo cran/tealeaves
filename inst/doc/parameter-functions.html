@@ -12,27 +12,57 @@
 
 <meta name="author" content="Chris Mur" />
 
-<meta name="date" content="2020-06-17" />
+<meta name="date" content="2022-07-19" />
 
 <title>Defining parameters as functions of other parameters</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -52,7 +82,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -106,6 +136,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -301,52 +332,77 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Defining parameters as functions of other parameters</h1>
+<h1 class="title toc-ignore">Defining parameters as functions of other
+parameters</h1>
 <h4 class="author">Chris Mur</h4>
-<h4 class="date">2020-06-17</h4>
+<h4 class="date">2022-07-19</h4>
 
 
 
-<p>In some cases, users may not wish to provide a parameter value, but rather have a value calculated based on other parameters. Currently, the only parameters that can be provided as functions are:</p>
+<p>In some cases, users may not wish to provide a parameter value, but
+rather have a value calculated based on other parameters. Currently, the
+only parameters that can be provided as functions are:</p>
 <ul>
 <li><code>nu_constant</code> in <code>constants()</code></li>
 <li><code>sh_constant</code> in <code>constants()</code></li>
 <li><code>T_sky</code> in <code>enviro_par()</code></li>
 </ul>
-<p>I plan to make more of these in the future, but I’ll briefly demonstrate how one would change the <code>T_sky</code> function. The default function from <a href="https://doi.org/10.1007/s11284-011-0905-5">Okajima <em>et al.</em> (2012)</a>, which was hard-coded in versions 1.0.0 and 1.0.1, is:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(tealeaves)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; Loading required package: units</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; udunits system database from /usr/local/share/udunits</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a></span>
-<span id="cb1-6"><a href="#cb1-6"></a>leaf_par   &lt;-<span class="st"> </span><span class="kw">make_leafpar</span>()   <span class="co"># leaf parameters</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>enviro_par &lt;-<span class="st"> </span><span class="kw">make_enviropar</span>() <span class="co"># environmental parameters</span></span>
-<span id="cb1-8"><a href="#cb1-8"></a>constants  &lt;-<span class="st"> </span><span class="kw">make_constants</span>() <span class="co"># physical constants</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a></span>
-<span id="cb1-10"><a href="#cb1-10"></a>enviro_par<span class="op">$</span>T_sky</span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="co">#&gt; function (pars) </span></span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="co">#&gt; {</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt;     pars$T_air - set_units(20, K) * pars$S_sw/set_units(1000, </span></span>
-<span id="cb1-14"><a href="#cb1-14"></a><span class="co">#&gt;         W/m^2)</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a><span class="co">#&gt; }</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; &lt;bytecode: 0x7fb367131490&gt;</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; &lt;environment: 0x7fb36712e1c0&gt;</span></span></code></pre></div>
-<p>Let’s change it simply be the air temperature (<code>T_air</code>). The current requirements for this function as of version 1.0.2 are:</p>
+<p>I plan to make more of these in the future, but I’ll briefly
+demonstrate how one would change the <code>T_sky</code> function. The
+default function from <a href="https://doi.org/10.1007/s11284-011-0905-5">Okajima <em>et al.</em>
+(2012)</a>, which was hard-coded in versions 1.0.0 and 1.0.1, is:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tealeaves)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loading required package: units</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; udunits database from /usr/local/share/udunits/udunits2.xml</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>leaf_par   <span class="ot">&lt;-</span> <span class="fu">make_leafpar</span>()   <span class="co"># leaf parameters</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>enviro_par <span class="ot">&lt;-</span> <span class="fu">make_enviropar</span>() <span class="co"># environmental parameters</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>constants  <span class="ot">&lt;-</span> <span class="fu">make_constants</span>() <span class="co"># physical constants</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>enviro_par<span class="sc">$</span>T_sky</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (pars) </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; {</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     pars$T_air - set_units(20, K) * pars$S_sw/set_units(1000, </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         W/m^2)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; }</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x7fd3ca6a5238&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x7fd3ca6a5d28&gt;</span></span></code></pre></div>
+<p>Let’s change it simply be the air temperature (<code>T_air</code>).
+The current requirements for this function as of version 1.0.2 are:</p>
 <ul>
-<li>It must take <code>pars</code> as the only argument, where <code>pars</code> is the concatenated set of leaf (<code>leaf_par()</code>) and environmental parameters (<code>enviro_par()</code>)</li>
-<li>It must return <code>T_sky</code> in units K. You can ensure this by using <code>units::set_units(., K)</code></li>
+<li>It must take <code>pars</code> as the only argument, where
+<code>pars</code> is the concatenated set of leaf
+(<code>leaf_par()</code>) and environmental parameters
+(<code>enviro_par()</code>)</li>
+<li>It must return <code>T_sky</code> in units K. You can ensure this by
+using <code>units::set_units(., K)</code></li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2"></a>enviro_par &lt;-<span class="st"> </span><span class="kw">make_enviropar</span>(</span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="dt">replace =</span> <span class="kw">list</span>(<span class="dt">T_sky =</span> <span class="cf">function</span>(pars) {pars<span class="op">$</span>T_air})</span>
-<span id="cb2-4"><a href="#cb2-4"></a>)</span>
-<span id="cb2-5"><a href="#cb2-5"></a>enviro_par<span class="op">$</span>T_sky</span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; function(pars) {pars$T_air}</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a>T_leaf &lt;-<span class="st"> </span><span class="kw">tleaf</span>(leaf_par, enviro_par, constants, <span class="dt">quiet =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb2-9"><a href="#cb2-9"></a></span>
-<span id="cb2-10"><a href="#cb2-10"></a>knitr<span class="op">::</span><span class="kw">kable</span>(T_leaf)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>enviro_par <span class="ot">&lt;-</span> <span class="fu">make_enviropar</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">replace =</span> <span class="fu">list</span>(<span class="at">T_sky =</span> <span class="cf">function</span>(pars) {pars<span class="sc">$</span>T_air})</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>enviro_par<span class="sc">$</span>T_sky</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function(pars) {pars$T_air}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>T_leaf <span class="ot">&lt;-</span> <span class="fu">tleaf</span>(leaf_par, enviro_par, constants, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(T_leaf)</span></code></pre></div>
 <table>
+<colgroup>
+<col width="8%" />
+<col width="3%" />
+<col width="7%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="15%" />
+<col width="6%" />
+<col width="5%" />
+<col width="5%" />
+<col width="6%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="right">T_leaf</th>
