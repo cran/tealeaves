@@ -10,39 +10,39 @@ library(magrittr)
 library(tealeaves)
 
 
-## ---- eval = FALSE, echo = TRUE-----------------------------------------------
-#  
-#  # install tidyverse packages if necessary
-#  # install.packages("tidyverse")
-#  
-#  library(dplyr)
-#  library(ggplot2)
-#  library(magrittr)
-#  library(tealeaves)
-#  
-#  # Parameter sets ----
-#  
-#  cs <- tealeaves::make_constants()
-#  lp <- tealeaves::make_leafpar(
-#    replace = list(
-#      # Hypo- and amphistomatous leaves
-#      logit_sr = set_units(c(-Inf, 0))
-#    )
-#  )
-#  ep <- tealeaves::make_enviropar(
-#    replace = list(
-#      # Low and high light
-#      S_sw = set_units(c(220, 660), "W/m^2"),
-#      # Air temperature gradient
-#      T_air = set_units(seq(278.15, 313.15, length.out = 25), "K")
-#      )
-#  )
-#  
-#  # Run tleaves ----
-#  tl_example1 <- tleaves(lp, ep, cs)
-#  
-#  usethis::use_data(tl_example1)
-#  
+## ----eval = FALSE, echo = TRUE------------------------------------------------
+# 
+# # install tidyverse packages if necessary
+# # install.packages("tidyverse")
+# 
+# library(dplyr)
+# library(ggplot2)
+# library(magrittr)
+# library(tealeaves)
+# 
+# # Parameter sets ----
+# 
+# cs <- tealeaves::make_constants()
+# lp <- tealeaves::make_leafpar(
+#   replace = list(
+#     # Hypo- and amphistomatous leaves
+#     logit_sr = set_units(c(-Inf, 0))
+#   )
+# )
+# ep <- tealeaves::make_enviropar(
+#   replace = list(
+#     # Low and high light
+#     S_sw = set_units(c(220, 660), "W/m^2"),
+#     # Air temperature gradient
+#     T_air = set_units(seq(278.15, 313.15, length.out = 25), "K")
+#     )
+# )
+# 
+# # Run tleaves ----
+# tl_example1 <- tleaves(lp, ep, cs)
+# 
+# usethis::use_data(tl_example1)
+# 
 
 ## ----plot temperature, echo = FALSE, eval = TRUE, fig.width=7-----------------
 

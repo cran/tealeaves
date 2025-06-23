@@ -7,7 +7,7 @@ knitr::opts_chunk$set(
   eval = TRUE
 )
 
-## ---- mwe---------------------------------------------------------------------
+## ----mwe----------------------------------------------------------------------
 
 library(magrittr)
 library(tealeaves)
@@ -23,7 +23,7 @@ T_leaf <- tleaf(leaf_par, enviro_par, constants, quiet = TRUE)
 T_leaf %>% knitr::kable()
 
 
-## ---- replace-defaults--------------------------------------------------------
+## ----replace-defaults---------------------------------------------------------
 
 # Use the `replace` argument to replace defaults. This must be a named list, and
 # each named element must have the proper units specified. See `?make_parameters`
@@ -52,7 +52,7 @@ T_leaf <- tleaf(leaf_par, enviro_par, constants, quiet = TRUE)
 T_leaf %>% knitr::kable()
 
 
-## ---- environmental-gradients-------------------------------------------------
+## ----environmental-gradients--------------------------------------------------
 
 # As before, use the `replace` argument to replace defaults, but this time we
 # enter multiple values
@@ -82,38 +82,38 @@ T_leaves %>%
   knitr::kable()
 
 
-## ---- parallel-example, eval = FALSE------------------------------------------
-#  # NOTE: not evaluated here because it caused error on CRAN. Copy-and-paste to run on your own machine.
-#  
-#  # We'll use the `replace` argument to enter multiple air temperatures and two light levels
-#  
-#  leaf_par  <- make_leafpar()
-#  
-#  enviro_par <- make_enviropar(
-#    replace = list(
-#      S_sw = set_units(c(300, 1000), "W/m^2"),
-#      T_air = set_units(seq(273.15, 313.15, length.out = 10), "K")
-#      )
-#    )
-#  
-#  constants  <- make_constants()
-#  
-#  tl <- tleaves(leaf_par, enviro_par, constants, progress = FALSE, quiet = TRUE,
-#                parallel = TRUE)
-#  tl$T_air %<>% drop_units() # for plotting
-#  tl$T_leaf %<>% drop_units() # for plotting
-#  tl %<>% dplyr::mutate(Light = dplyr::case_when(
-#   round(drop_units(S_sw), 0) == 300 ~ "Shade",
-#   round(drop_units(S_sw), 0) == 1000 ~ "Sun"
-#  ))
-#  
-#  # Plot T_air versus T_leaf - T_air at different light levels
-#  library(ggplot2)
-#  ggplot(tl, aes(T_air, T_leaf - T_air, color = Light)) +
-#    geom_line() +
-#    xlab("Air Temperature [K]") +
-#    ylab("Leaf - Air Temperature [K]") +
-#    theme_minimal() +
-#    NULL
-#  
+## ----parallel-example, eval = FALSE-------------------------------------------
+# # NOTE: not evaluated here because it caused error on CRAN. Copy-and-paste to run on your own machine.
+# 
+# # We'll use the `replace` argument to enter multiple air temperatures and two light levels
+# 
+# leaf_par  <- make_leafpar()
+# 
+# enviro_par <- make_enviropar(
+#   replace = list(
+#     S_sw = set_units(c(300, 1000), "W/m^2"),
+#     T_air = set_units(seq(273.15, 313.15, length.out = 10), "K")
+#     )
+#   )
+# 
+# constants  <- make_constants()
+# 
+# tl <- tleaves(leaf_par, enviro_par, constants, progress = FALSE, quiet = TRUE,
+#               parallel = TRUE)
+# tl$T_air %<>% drop_units() # for plotting
+# tl$T_leaf %<>% drop_units() # for plotting
+# tl %<>% dplyr::mutate(Light = dplyr::case_when(
+#  round(drop_units(S_sw), 0) == 300 ~ "Shade",
+#  round(drop_units(S_sw), 0) == 1000 ~ "Sun"
+# ))
+# 
+# # Plot T_air versus T_leaf - T_air at different light levels
+# library(ggplot2)
+# ggplot(tl, aes(T_air, T_leaf - T_air, color = Light)) +
+#   geom_line() +
+#   xlab("Air Temperature [K]") +
+#   ylab("Leaf - Air Temperature [K]") +
+#   theme_minimal() +
+#   NULL
+# 
 
